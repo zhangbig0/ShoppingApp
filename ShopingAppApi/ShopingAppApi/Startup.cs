@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using ShoppingAppApi.Infrastructure;
 using ShoppingAppApi.Services;
 
@@ -31,12 +32,20 @@ namespace ShoppingAppApi
             services.AddControllers();
             services.AddDbContextPool<AppDbContext>(builder =>
             {
-                builder.UseSqlServer(
-                    "Data Source=(localdb)\\ProjectsV13;Initial Catalog=master;DataBase = ShoppingApp; Integrated Security=True;" +
-                    "Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+                builder.UseMySql("server=121.5.26.37;user=zhangbig;password=zq19990821;database=ShoppingApp",
+                    ServerVersion.AutoDetect(
+                        "server=121.5.26.37;user=zhangbig;password=zq19990821;database=ShoppingApp"));
             });
             services.AddScoped<IAdminUserRepository, AdminUserRepository>();
             services.AddScoped<IGoodsRepository, GoodsRepository>();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("Open", builder => builder.AllowAnyMethod().AllowAnyOrigin().AllowAnyHeader());
+            });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "DataAnalyse.Net", Version = "v1"});
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,9 +54,13 @@ namespace ShoppingAppApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "DataAnalyse.Net v1"));
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("Open");
 
             app.UseRouting();
 

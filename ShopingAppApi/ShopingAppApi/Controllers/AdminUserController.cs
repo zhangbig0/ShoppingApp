@@ -1,44 +1,59 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Newtonsoft.Json;
+using ShoppingApp.Share.Dto;
+using ShoppingAppApi.Infrastructure;
 using ShoppingAppApi.Services;
 
 namespace ShoppingAppApi.Controllers
 {
     [Route("api/[controller]/[action]")]
+    [Produces("application/json")]
     [ApiController]
     public class AdminUserController : ControllerBase
     {
         private readonly IAdminUserRepository _adminUserRepository;
+        private readonly AppDbContext _context;
 
-        public AdminUserController(IAdminUserRepository adminUserRepository)
+        public AdminUserController(IAdminUserRepository adminUserRepository, AppDbContext context)
         {
             _adminUserRepository = adminUserRepository;
+            _context = context;
         }
 
-        [HttpGet]
-        public ActionResult<object> Login(string account, string password)
+        [HttpPost]
+        public ActionResult<AdminUserLoginSuccessDto> Login([FromBody] AdminUserLoginDto adminUserLoginDto)
         {
-            if (string.IsNullOrEmpty(account) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(adminUserLoginDto.Account) || string.IsNullOrEmpty(adminUserLoginDto.Password))
             {
-                return "账号或密码为空";
+                return BadRequest("用户名或密码为空");
             }
+
             try
             {
-                var adminUser = _adminUserRepository.GetAdminUser(account, password);
+                var adminUser =
+                    _adminUserRepository.LoginAdminUser(adminUserLoginDto.Account, adminUserLoginDto.Password);
                 if (adminUser != null)
                 {
-                    var md5 = MD5.Create(adminUser.Id + adminUser.Accout
+                    var md5 = MD5.Create(adminUser.Id + adminUser.Account
                                                       + adminUser.Password);
-                    return new
+                    return new AdminUserLoginSuccessDto
                     {
-                        sessionKey = md5.Hash,
-                        LogonUser = adminUser.Accout
+                        // SessionKey = md5.Hash,
+                        Account = adminUser.Account,
+                        Created = adminUser.Created,
+                        Id = adminUser.Id,
+                        Password = adminUser.Password,
+                        Role = adminUser.Role
                     };
                 }
                 else
                 {
-                    return "账号或密码错误";
+                    return BadRequest("注册管理员用户失败");
                 }
             }
             catch (Exception e)
@@ -46,27 +61,37 @@ namespace ShoppingAppApi.Controllers
                 Console.WriteLine(e);
                 throw;
             }
-            
+
+            return null;
         }
 
         [HttpPost]
-        public ActionResult<object> Register(string account, string password)
+        public ActionResult<AdminUserLoginSuccessDto> Register([FromBody] RegisterDto registerDto)
         {
-            var adminUser = _adminUserRepository.RegisterAdminUser(account, password);
+            var hasSameAccount = _context.AdminUser.ToList().Any(x => x.Account == registerDto.Account);
+            if (hasSameAccount)
+            {
+                return BadRequest("账户已存在");
+            }
+            var adminUser =
+                _adminUserRepository.RegisterAdminUser(registerDto.Account, registerDto.Password);
             if (adminUser != null)
             {
-                return new
+                var md5 = MD5.Create(adminUser.Id + adminUser.Account
+                                                  + adminUser.Password);
+                return new AdminUserLoginSuccessDto
                 {
-                    code = 0,
-                    adminUser
+                    // SessionKey = md5.Hash,
+                    Account = adminUser.Account,
+                    Created = adminUser.Created,
+                    Id = adminUser.Id,
+                    Password = adminUser.Password,
+                    Role = adminUser.Role
                 };
             }
             else
             {
-                return new
-                {
-                    code = 1,
-                };
+                return null;
             }
         }
     }

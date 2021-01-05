@@ -39,10 +39,13 @@ namespace BootstrapBlazorApp.Shared.Shared
         {
             var menus = new List<MenuItem>
             {
-                new MenuItem() { Text = "返回组件库", Icon = "fa fa-fw fa-home", Url = "https://www.blazor.zone/components" },
-                new MenuItem() { Text = "Index", Icon = "fa fa-fw fa-fa", Url = "" },
-                new MenuItem() { Text = "Counter", Icon = "fa fa-fw fa-check-square-o", Url = "counter" },
-                new MenuItem() { Text = "FetchData", Icon = "fa fa-fw fa-database", Url = "fetchdata" }
+                new MenuItem() {Text = "返回组件库", Icon = "fa fa-fw fa-home", Url = "https://www.blazor.zone/components"},
+                new MenuItem() {Text = "Index", Icon = "fa fa-fw fa-fa", Url = ""},
+                new MenuItem() {Text = "Counter", Icon = "fa fa-fw fa-check-square-o", Url = "counter"},
+                new MenuItem() {Text = "Goods", Icon = "fa fa-fw fa-check-square-o", Url = "goods"},
+                new MenuItem() {Text = "FetchData", Icon = "fa fa-fw fa-database", Url = "FetchData"},
+                new MenuItem() {Text = "Login", Icon = "fa fa-fw fa-database", Url = "login"},
+                new MenuItem() {Text = "Register", Icon = "fa fa-fw fa-database", Url = "Register"}
             };
 
             return menus;

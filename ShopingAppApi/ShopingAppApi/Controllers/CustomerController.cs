@@ -9,6 +9,7 @@ using ShoppingAppApi.Infrastructure;
 namespace ShoppingAppApi.Controllers
 {
     [Route("api/[controller]/[action]")]
+    [Produces("application/json")]
     [ApiController]
     public class CustomerController : ControllerBase
     {

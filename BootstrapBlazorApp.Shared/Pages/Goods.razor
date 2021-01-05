@@ -1,0 +1,42 @@
+﻿@page "/goods"
+@inherits GoodsBase
+
+
+@using System.ComponentModel
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Logging
+@using Console = System.Console
+
+
+<Table TItem="GoodsDto" Items="@GoodsDtos" PageItemsSource="new[] {4, 8}" AutoGenerateColumns="true" IsMultipleSelect="true" IsBordered="true"
+       IsPagination="true" ShowToolbar="true" ShowSearch="true" ShowExtendButtons="true" ShowSkeleton="true" AddModalTitle="增加商品"
+       EditModalTitle="商品编辑" ClickToSelect="true" OnAddAsync="OnAddAsync" OnSaveAsync="OnSaveAsync" OnDeleteAsync="OnDeleteAsync"
+       EditMode="EditMode.EditForm" ShowExportButton="true" >
+    <TableColumns>
+
+        <TableColumn @bind-Field="@context.Guid" Visible="false" Editable="false" Sortable="true"/>
+        <TableColumn @bind-Field="@context.Name"/>
+        <TableColumn @bind-Field="@context.Class"/>
+        <TableColumn @bind-Field="@context.Stock"/>
+        <TableColumn @bind-Field="@context.Stock"/>
+    </TableColumns>
+    @* <EditTemplate> *@
+    @*     <div class="form-inline"> *@
+    @*         <div class="row"> *@
+    @*             <div class="form-group col-12 col-sm-6"> *@
+    @*                 <BootstrapInput @bind-Value="@context.Name"></BootstrapInput> *@
+    @*             </div> *@
+    @*             <div class="form-group col-12 col-sm-6"> *@
+    @*                 <BootstrapInput @bind-Value="@context.Class"></BootstrapInput> *@
+    @*             </div> *@
+    @*             <div class="form-group col-12 col-sm-6"> *@
+    @*                 <BootstrapInputNumber @bind-Value="@context.Stock"></BootstrapInputNumber> *@
+    @*             </div> *@
+    @*             <div class="form-group col-12 col-sm-6"> *@
+    @*                 <BootstrapInputNumber @bind-Value="@context.Price"></BootstrapInputNumber> *@
+    @*             </div> *@
+    @*         </div> *@
+    @*     </div> *@
+    @* </EditTemplate> *@
+</Table>

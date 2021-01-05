@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -16,22 +17,37 @@ namespace ShoppingAppApi.Services
             _context = context;
         }
 
-        public AdminUser GetAdminUser(string account, string password)
+        public IEnumerable<AdminUser> GetAdminUser()
         {
-            return _context.AdminUser.Single(user => user.Accout == account && user.Password == password);
+            return _context.AdminUser.AsEnumerable();
+        }
+
+        public AdminUser LoginAdminUser(string account, string password)
+        {
+            var adminUser = _context.AdminUser.Single(x => x.Account == account && x.Password == password);
+            if (adminUser != null)
+            {
+                return adminUser;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public AdminUser RegisterAdminUser(string account, string password)
         {
-            var AdminUser = new AdminUser
+            var adminUser = new AdminUser
             {
-                Accout = account,
+                Account = account,
                 Password = password,
                 Created = DateTime.Now,
                 Id = Guid.NewGuid(),
+                Role = "管理员"
             };
-            _context.AdminUser.Add(AdminUser);
-            return AdminUser;
+            _context.AdminUser.Add(adminUser);
+            _context.SaveChanges();
+            return adminUser;
         }
     }
 }

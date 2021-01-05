@@ -5,12 +5,13 @@ using ShoppingApp.Share.Dto;
 
 namespace BootstrapBlazorApp.Shared.Services
 {
-    public interface IGoodsServices
+    public interface IGoodsService
     {
         Task<IEnumerable<GoodsDto>> GetAll();
         Task<IEnumerable<GoodsDto>> GetForGoodsName(string goodsName);
         Task<GoodsDto> GetOne(Guid guid);
         Task<GoodsDto> Add(GoodsAddOrUpdateDto goods);
         Task<GoodsDto> Delete(Guid guid);
+        Task<GoodsDto?> Update(Guid guid, GoodsAddOrUpdateDto goodsAddOrUpdateDto);
     }
 }

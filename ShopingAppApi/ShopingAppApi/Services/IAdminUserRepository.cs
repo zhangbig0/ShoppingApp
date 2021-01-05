@@ -9,7 +9,8 @@ namespace ShoppingAppApi.Services
 {
     public interface IAdminUserRepository
     {
-        public AdminUser GetAdminUser(string account, string password);
+        public IEnumerable<AdminUser> GetAdminUser();
+        public AdminUser LoginAdminUser(string account, string password);
         public AdminUser RegisterAdminUser(string account, string password);
     }
 }

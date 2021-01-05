@@ -23,7 +23,7 @@ namespace ShoppingAppApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<string>("Accout")
+                    b.Property<string>("Account")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<DateTime>("Created")
@@ -46,7 +46,7 @@ namespace ShoppingAppApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<string>("Accout")
+                    b.Property<string>("Account")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<DateTime>("Created")
@@ -101,7 +101,7 @@ namespace ShoppingAppApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("add77178-3619-4cd5-aa54-f79ab42df1bc"),
+                            Id = new Guid("f326544a-6546-4f3e-b65f-076827afb7b5"),
                             Class = "电器",
                             Name = "热水器",
                             Price = 300m,
@@ -109,7 +109,7 @@ namespace ShoppingAppApi.Migrations
                         },
                         new
                         {
-                            Id = new Guid("4284cb01-5786-4112-9ecc-8ddf0c5cd17d"),
+                            Id = new Guid("2def1873-a4ff-4063-95c6-af9384f898c0"),
                             Class = "电器",
                             Name = "冰箱",
                             Price = 270m,
@@ -117,7 +117,7 @@ namespace ShoppingAppApi.Migrations
                         },
                         new
                         {
-                            Id = new Guid("81b4ab69-d459-47fa-81d6-58417ee5e7eb"),
+                            Id = new Guid("d760715b-07d1-4623-9cfd-8ebdba57e0b8"),
                             Class = "电器",
                             Name = "TV",
                             Price = 300m,
