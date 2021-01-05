@@ -1,0 +1,13 @@
+﻿# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/projectSettingsUpdater.xml
+/contentModel.xml
+/modules.xml
+/.idea.ShoppingApp.BackGtound.iml
+# Datasource local storage ignored files
+/../../../../../../../../../:\study\大三3\Web\ShoppingApp.BackGtound\ShoppingApp.BackGtound\.idea\.idea.ShoppingApp.BackGtound\.idea/dataSources/
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
