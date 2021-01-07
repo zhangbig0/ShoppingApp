@@ -10,7 +10,7 @@ namespace ShoppingAppApi.Entity
     {
         [Key]
         public Guid Id { get; set; }
-        public IList<Goods> GoodsList { get; set; }
+        public List<Goods> GoodsList { get; set; }
         public int Count { get; set; }
         public Customer Customer { get; set; }
         public string DeliverAddress { get; set; }

@@ -8,10 +8,15 @@ namespace ShoppingAppApi.Entity
 {
     public class ShoppingBracket
     {
-        [Key]
-        public Guid Id { get; set; }
-        public IList<Goods> GoodsList { get; set; }
+        public ShoppingBracket()
+        {
+            GoodsList = new List<ShoppingBracketGoods>();
+        }
+
+        [Key] public Guid Id { get; set; }
+        public List<ShoppingBracketGoods> GoodsList { get; set; }
         public int Count { get; set; }
         public Customer Customer { get; set; }
+        public Guid CustomerId { get; set; }
     }
 }

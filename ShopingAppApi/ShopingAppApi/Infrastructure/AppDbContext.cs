@@ -4,19 +4,26 @@ using ShoppingAppApi.Entity;
 
 namespace ShoppingAppApi.Infrastructure
 {
-    public class AppDbContext:DbContext
+    public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
+
         public DbSet<AdminUser> AdminUser { get; set; }
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Goods> Goods { get; set; }
         public DbSet<Order> Order { get; set; }
         public DbSet<ShoppingBracket> ShoppingBracket { get; set; }
+        public DbSet<ShoppingBracketGoods> ShoppingBracketGoods { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ShoppingBracketGoods>().HasKey(x => new {x.GoodsId, x.ShoppingBracketId});
+            modelBuilder.Entity<ShoppingBracket>()
+                .HasOne<Customer>(x => x.Customer)
+                .WithOne(x => x.ShoppingBracket)
+                .HasForeignKey<ShoppingBracket>(x => x.CustomerId);
             modelBuilder.Entity<Goods>().HasData(
                 new Goods
                 {
@@ -43,7 +50,6 @@ namespace ShoppingAppApi.Infrastructure
                     Class = "电器"
                 });
             base.OnModelCreating(modelBuilder);
-
         }
     }
 }

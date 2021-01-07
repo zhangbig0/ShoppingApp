@@ -1,11 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using BootstrapBlazor.Components;
 
 namespace ShoppingApp.Share.Dto
 {
-    public class GoodsDto
+    public class BracketGoodsDto
     {
         [AutoGenerateColumn(Visible = false)] public Guid Id { get; set; }
 
@@ -13,8 +12,6 @@ namespace ShoppingApp.Share.Dto
         [AutoGenerateColumn(Sortable = true)]
         public string Name { get; set; }
 
-        [DisplayName("价格")] public decimal Price { get; set; }
-        [DisplayName("存货")] public int Stock { get; set; }
-        [DisplayName("类别")] public string Class { get; set; }
-    }       
+        public int Num { get; set; }
+    }
 }

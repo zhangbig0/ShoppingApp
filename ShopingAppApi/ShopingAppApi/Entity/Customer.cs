@@ -9,5 +9,7 @@ namespace ShoppingAppApi.Entity
     {
         public string NickName { get; set; }
         public int Score { get; set; }
+        public Guid ShoppingBracketId { get; set; }
+        public ShoppingBracket ShoppingBracket { get; set; }
     }
 }

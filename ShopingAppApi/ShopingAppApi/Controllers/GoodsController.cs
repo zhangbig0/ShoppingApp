@@ -30,34 +30,34 @@ namespace ShoppingAppApi.Controllers
             return _goodsRepository.GetAll().Select(goods => new GoodsDto
             {
                 Class = goods.Class,
-                Guid = goods.Id,
+                Id = goods.Id,
                 Name = goods.Name,
                 Price = goods.Price,
                 Stock = goods.Stock
             }).ToList();
         }
 
-        [HttpGet]
+        [HttpGet("{goodsName}")]
         public ActionResult<IList<GoodsDto>> Search(string goodsName)
         {
             return _goodsRepository.GetByGoodName(goodsName).Select(goods => new GoodsDto
             {
                 Class = goods.Class,
-                Guid = goods.Id,
+                Id = goods.Id,
                 Name = goods.Name,
                 Price = goods.Price,
                 Stock = goods.Stock
             }).ToList();
         }
 
-        [HttpGet]
+        [HttpGet("{guid}")]
         public GoodsDto Detail([FromRoute] Guid guid)
         {
             var goods = _goodsRepository.GetById(guid);
             return new GoodsDto
             {
                 Class = goods.Class,
-                Guid = goods.Id,
+                Id = goods.Id,
                 Name = goods.Name,
                 Price = goods.Price,
                 Stock = goods.Stock
@@ -77,7 +77,7 @@ namespace ShoppingAppApi.Controllers
             return new GoodsDto
             {
                 Class = goods.Class,
-                Guid = goods.Id,
+                Id = goods.Id,
                 Name = goods.Name,
                 Price = goods.Price,
                 Stock = goods.Stock
@@ -107,7 +107,7 @@ namespace ShoppingAppApi.Controllers
             return new GoodsDto
             {
                 Class = updateGoods.Class,
-                Guid = updateGoods.Id,
+                Id = updateGoods.Id,
                 Name = updateGoods.Name,
                 Price = updateGoods.Price,
                 Stock = updateGoods.Stock
@@ -121,7 +121,7 @@ namespace ShoppingAppApi.Controllers
             return new GoodsDto
             {
                 Class = deleteGoods.Class,
-                Guid = deleteGoods.Id,
+                Id = deleteGoods.Id,
                 Name = deleteGoods.Name,
                 Price = deleteGoods.Price,
                 Stock = deleteGoods.Stock

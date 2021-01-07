@@ -26,15 +26,15 @@ namespace BootstrapBlazorApp.Shared.Pages
         {
             Name = string.Empty,
             Class = string.Empty,
-            Guid = Guid.Empty,
+            Id = Guid.Empty,
             Price = decimal.Zero,
             Stock = 0
         };
 
         public IList<GoodsDto> GoodsDtos { get; set; } = new List<GoodsDto>();
 
-        public ConcurrentDictionary<Type, Func<IEnumerable<GoodsDto>, string, SortOrder, IEnumerable<GoodsDto>>>
-            SortLambdaCache { get; set; } = new();
+        // public ConcurrentDictionary<Type, Func<IEnumerable<GoodsDto>, string, SortOrder, IEnumerable<GoodsDto>>>
+        //     SortLambdaCache { get; set; } = new();
 
 
         protected override async Task OnInitializedAsync()
@@ -58,7 +58,7 @@ namespace BootstrapBlazorApp.Shared.Pages
         {
             return Task.FromResult(new GoodsDto
             {
-                Guid = Guid.Empty
+                Id = Guid.Empty
             });
         }
 
@@ -72,7 +72,7 @@ namespace BootstrapBlazorApp.Shared.Pages
                 Stock = item.Stock
             };
             GoodsDto goodsDto;
-            if (item.Guid == Guid.Empty || item.Guid.ToString() == "00000000-0000-0000-0000-000000000000")
+            if (item.Id == Guid.Empty || item.Id.ToString() == "00000000-0000-0000-0000-000000000000")
             {
                 goodsDto = await GoodsService.Add(goodsAddDto);
                 if (goodsDto != null)
@@ -83,10 +83,10 @@ namespace BootstrapBlazorApp.Shared.Pages
             }
             else
             {
-                goodsDto = await GoodsService.Update(item.Guid, goodsAddDto);
+                goodsDto = await GoodsService.Update(item.Id, goodsAddDto);
                 if (goodsDto != null)
                 {
-                    var old = GoodsDtos.Single(x => x.Guid == item.Guid);
+                    var old = GoodsDtos.Single(x => x.Id == item.Id);
                     old.Class = goodsDto.Class;
                     old.Name = goodsDto.Name;
                     old.Price = goodsDto.Price;
@@ -146,7 +146,7 @@ namespace BootstrapBlazorApp.Shared.Pages
         {
             foreach (var goodsDto in items)
             {
-                var delete = await GoodsService.Delete(goodsDto.Guid);
+                var delete = await GoodsService.Delete(goodsDto.Id);
 
                 if (delete == null)
                 {
