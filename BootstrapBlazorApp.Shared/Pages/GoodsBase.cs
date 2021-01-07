@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -8,11 +8,12 @@ using Blazored.SessionStorage;
 using BootstrapBlazor.Components;
 using BootstrapBlazorApp.Shared.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using ShoppingApp.Share.Dto;
 
 namespace BootstrapBlazorApp.Shared.Pages
 {
-    public partial class GoodsBase : ComponentBase
+    public class GoodsBase : ComponentBase
     {
         [Inject] public IGoodsService GoodsService { get; set; }
 
@@ -96,6 +97,53 @@ namespace BootstrapBlazorApp.Shared.Pages
             }
 
             return await Task.FromResult(false);
+        }
+
+        public async Task OnFileChange(IEnumerable<UploadFile> uploadFiles)
+        {
+            var uploadFile = uploadFiles.ToList()[0];
+            var imgFileName = uploadFile.FileName;
+            if (uploadFile.File != null)
+            {
+                var openReadStream = uploadFile.File.OpenReadStream();
+                MemoryStream memoryStream = new MemoryStream();
+                await openReadStream.CopyToAsync(memoryStream);
+                Toast?.SetPlacement(Placement.BottomEnd);
+                ToastService?.Show(new ToastOption()
+                {
+                    Category = ToastCategory.Success,
+                    Title = "保存成功",
+                    Content = JsonSerializer.Serialize(memoryStream.ToArray())
+                });
+                if (memoryStream != null)
+                {
+                    Toast?.SetPlacement(Placement.BottomEnd);
+                    ToastService?.Show(new ToastOption()
+                    {
+                        Category = ToastCategory.Success,
+                        Title = "保存成功",
+                        Content = "保存数据成功，4 秒后自动关闭"
+                    });
+                    var data = memoryStream.ToArray();
+
+                    var uploadsImgSrc = await GoodsService.UploadsImg(data, imgFileName);
+                    if (uploadsImgSrc != null)
+                    {
+                        Toast?.SetPlacement(Placement.BottomEnd);
+                        ToastService?.Show(new ToastOption()
+                        {
+                            Category = ToastCategory.Success,
+                            Title = "保存成功",
+                            Content = "保存数据成功，4 秒后自动关闭"
+                        });
+                    }
+                }
+                else
+                {
+                    memoryStream = new MemoryStream();
+                    await openReadStream.CopyToAsync(memoryStream);
+                }
+            }
         }
 
         // protected Task<QueryData<GoodsDto>> OnQueryAsync(QueryPageOptions options)

@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Hosting;
 using ShoppingApp.Share.Dto;
 using ShoppingAppApi.Entity;
 using ShoppingAppApi.Services;
@@ -18,10 +18,12 @@ namespace ShoppingAppApi.Controllers
     public class GoodsController : ControllerBase
     {
         private readonly IGoodsRepository _goodsRepository;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public GoodsController(IGoodsRepository goodsRepository)
+        public GoodsController(IGoodsRepository goodsRepository, IWebHostEnvironment webHostEnvironment)
         {
             _goodsRepository = goodsRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet]
@@ -89,7 +91,6 @@ namespace ShoppingAppApi.Controllers
         public ActionResult<GoodsDto> UpdateGoods([FromRoute] string guid,
             [FromBody] GoodsAddOrUpdateDto goodsAddOrUpdateDto)
         {
-            
             var goods = new Goods
             {
                 Class = goodsAddOrUpdateDto.Class,
@@ -126,6 +127,25 @@ namespace ShoppingAppApi.Controllers
                 Price = deleteGoods.Price,
                 Stock = deleteGoods.Stock
             };
+        }
+        [Consumes("multipart/form-data")]
+        [HttpPost]
+        public async Task<ActionResult<string>> UploadFile(IFormFile imgFile)
+        {
+            if (imgFile.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "image");
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + imgFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                await imgFile.CopyToAsync(new FileStream(filePath, FileMode.Create));
+
+                return filePath;
+            }
+            else
+            {
+                return BadRequest("文件不存在");
+            }
         }
     }
 }

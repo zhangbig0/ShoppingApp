@@ -12,9 +12,8 @@
 <Table TItem="GoodsDto" Items="@GoodsDtos" PageItemsSource="new[] {4, 8}" AutoGenerateColumns="true" IsMultipleSelect="true" IsBordered="true"
        IsPagination="true" ShowToolbar="true" ShowSearch="true" ShowExtendButtons="true" ShowSkeleton="true" AddModalTitle="增加商品"
        EditModalTitle="商品编辑" ClickToSelect="true" OnAddAsync="OnAddAsync" OnSaveAsync="OnSaveAsync" OnDeleteAsync="OnDeleteAsync"
-      ShowExportButton="true" >
+       ShowExportButton="true">
     <TableColumns>
-
         <TableColumn @bind-Field="@context.Id" Visible="false" Editable="false" Sortable="true"/>
         <TableColumn @bind-Field="@context.Name"/>
         <TableColumn @bind-Field="@context.Class"/>
@@ -23,7 +22,6 @@
     </TableColumns>
     <EditTemplate>
         <div class="form-inline">
-            <Upload ShowPreview="true"></Upload>
             <div class="row">
                 <div class="form-group col-12 col-sm-6">
                     <BootstrapInput @bind-Value="@context.Name"></BootstrapInput>
@@ -32,12 +30,16 @@
                     <BootstrapInput @bind-Value="@context.Class"></BootstrapInput>
                 </div>
                 <div class="form-group col-12 col-sm-6">
-                    <BootstrapInputNumber @bind-Value="@context.Stock"></BootstrapInputNumber>
+                    <BootstrapInputNumber  @bind-Value="@context.Stock"></BootstrapInputNumber>
                 </div>
                 <div class="form-group col-12 col-sm-6">
                     <BootstrapInputNumber @bind-Value="@context.Price"></BootstrapInputNumber>
                 </div>
+                <div class="form-group col-12 col-sm-6">
+                    <BootstrapInput @bind-Value="@context.ImgSrc"></BootstrapInput>
+                </div>
             </div>
+            <Upload ShowDeleteButton="true" OnChange="@OnFileChange"></Upload>
         </div>
     </EditTemplate>
 </Table>

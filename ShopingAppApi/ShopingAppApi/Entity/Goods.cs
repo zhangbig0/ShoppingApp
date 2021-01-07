@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -17,5 +18,6 @@ namespace ShoppingAppApi.Entity
         public decimal Price { get; set; }
         public string Class { get; set; }
         public List<ShoppingBracketGoods> InShoppingBracketGoods { get; set; }
+        public string ImgSrc { get; set; }
     }
 }

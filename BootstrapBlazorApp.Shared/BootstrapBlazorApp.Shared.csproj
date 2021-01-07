@@ -19,4 +19,10 @@
       <ProjectReference Include="..\ShoppingApp.Share\ShoppingApp.Share.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Update="Pages\Register.razor">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </Content>
+    </ItemGroup>
+
 </Project>

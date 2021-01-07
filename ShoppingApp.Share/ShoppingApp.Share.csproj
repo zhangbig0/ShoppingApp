@@ -5,7 +5,37 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="BootstrapBlazor" Version="5.0.9" />
+      <None Remove="Dto\Register.razor" />
+      <None Remove="Dto\wwwroot\css\site.css" />
+      <None Remove="Dto\wwwroot\images\Argo-C.png" />
+      <None Remove="Dto\wwwroot\images\Argo.png" />
+      <None Remove="Dto\wwwroot\images\brand.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Dto\wwwroot\css\site.css">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Include="Dto\wwwroot\images\Argo-C.png">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Include="Dto\wwwroot\images\Argo.png">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Include="Dto\wwwroot\images\brand.png">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Blazored.SessionStorage" Version="1.0.12" />
+      <PackageReference Include="BootstrapBlazor" Version="5.0.10" />
+      <PackageReference Include="BootstrapBlazor.TableExport" Version="5.0.3" />
+      <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.1" />
     </ItemGroup>
 
 </Project>

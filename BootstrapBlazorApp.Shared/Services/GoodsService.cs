@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using BootstrapBlazor.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using ShoppingApp.Share.Dto;
 using Console = System.Console;
 
@@ -78,7 +80,7 @@ namespace BootstrapBlazorApp.Shared.Services
 
         public async Task<GoodsDto> Update(Guid guid, GoodsAddOrUpdateDto goodsAddOrUpdateDto)
         {
-            var httpResponseMessage =await  _httpClient.PostAsync(
+            var httpResponseMessage = await _httpClient.PostAsync(
                 $"/api/goods/UpdateGoods/{guid.ToString()}",
                 new StringContent(JsonSerializer.Serialize(
                     goodsAddOrUpdateDto), Encoding.UTF8, "application/json"));
@@ -90,6 +92,28 @@ namespace BootstrapBlazorApp.Shared.Services
             {
                 PropertyNameCaseInsensitive = true
             });
+        }
+
+        public async Task<string> UploadsImg(byte[] imgFileBmp, string fileName)
+        {
+            var fileContent = new ByteArrayContent(imgFileBmp);
+            fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+            {
+                Name = "file",
+                FileName = fileName
+            };
+
+            MultipartFormDataContent multipartFormDataContent = new MultipartFormDataContent {fileContent};
+
+            var httpResponseMessage = await _httpClient.PostAsync("/api/goods/UploadFile", multipartFormDataContent);
+
+            var imgSrc = JsonSerializer.Deserialize<string>(await httpResponseMessage.Content.ReadAsStringAsync(),
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                });
+
+            return imgSrc;
         }
     }
 }
