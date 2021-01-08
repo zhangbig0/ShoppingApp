@@ -1,0 +1,16 @@
+﻿@page "/admin-user-manage"
+
+<h3>AdminUserManage</h3>
+
+<Table TItem="AdminUserDto" AddModalTitle="增加用户" AutoGenerateColumns="true" ClickToSelect="true" EditModalTitle="用户编辑" EditMode="EditMode.EditForm"
+       IsBordered="true" IsMultipleSelect="true" IsPagination="true" Items="@AdminUserDtos" OnAddAsync="OnAddAsync" OnDeleteAsync="OnDeleteAsync"
+       OnSaveAsync="OnSaveAsync" PageItemsSource="new[] {4, 8}" ShowExportButton="true" ShowExtendButtons="true" ShowSearch="true" ShowSkeleton="true"
+       ShowToolbar="true">
+    <TableColumns>
+        <TableColumn @bind-Field="@context.Id"></TableColumn>
+        <TableColumn @bind-Field="@context.Account"></TableColumn>
+        <TableColumn @bind-Field="@context.Password"></TableColumn>
+        <TableColumn @bind-Field="@context.Created"></TableColumn>
+        <TableColumn @bind-Field="@context.Role"></TableColumn>
+    </TableColumns>
+</Table>

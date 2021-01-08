@@ -41,6 +41,8 @@ namespace BootstrapBlazorApp.WebAssembly
 
             builder.Services.AddSingleton<WeatherForecastService>();
 
+            builder.Services.AddScoped<IAuthentication, Authenticate>();
+
             builder.Services.AddBootstrapBlazorTableExcelExport();
 
             builder.Services.AddBlazoredSessionStorage();

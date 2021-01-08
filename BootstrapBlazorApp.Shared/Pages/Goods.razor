@@ -5,13 +5,13 @@
 <Table TItem="GoodsDto" Items="@GoodsDtos" PageItemsSource="new[] {4, 8}" AutoGenerateColumns="true" IsMultipleSelect="true" IsBordered="true"
        IsPagination="true" ShowToolbar="true" ShowSearch="true" ShowExtendButtons="true" ShowSkeleton="true" AddModalTitle="增加商品"
        EditModalTitle="商品编辑" ClickToSelect="true" OnAddAsync="OnAddAsync" OnSaveAsync="OnSaveAsync" OnDeleteAsync="OnDeleteAsync"
-       ShowExportButton="true">
+       ShowExportButton="true" OnQueryAsync="OnEditQueryAsync" SearchModel="SearchModel">
     <TableColumns>
         <TableColumn @bind-Field="@context.Id" Visible="false" Editable="false" Sortable="true"/>
-        <TableColumn @bind-Field="@context.Name"/>
-        <TableColumn @bind-Field="@context.Class"/>
+        <TableColumn @bind-Field="@context.Name" Searchable="true"/>
+        <TableColumn @bind-Field="@context.Class" Searchable="true"/>
         <TableColumn @bind-Field="@context.Stock"/>
-        <TableColumn @bind-Field="@context.Stock"/>
+        <TableColumn @bind-Field="@context.Price"/>
         <TableColumn @bind-Field="@context.ImgSrc"/>
     </TableColumns>
     <EditTemplate>

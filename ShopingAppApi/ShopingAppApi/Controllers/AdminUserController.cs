@@ -87,10 +87,10 @@ namespace ShoppingAppApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GoodsDto>>> Index()
+        public async Task<ActionResult<IEnumerable<AdminUserDto>>> Index()
         {
             var adminUsers = await _context.AdminUser.ToListAsync();
-            return _mapper.Map<List<GoodsDto>>(adminUsers);
+            return _mapper.Map<List<AdminUserDto>>(adminUsers);
         }
 
         [HttpPost]

@@ -20,7 +20,7 @@ namespace BootstrapBlazorApp.Shared.Services
         public async Task<List<CustomerDto>> GetCustomerAsync()
         {
             return await JsonSerializer.DeserializeAsync<List<CustomerDto>>(
-                await _httpClient.GetStreamAsync("/api/Customer/index"),
+                await _httpClient.GetStreamAsync("/api/Customers/GetCustomer"),
                 new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
@@ -29,7 +29,7 @@ namespace BootstrapBlazorApp.Shared.Services
 
         public async Task<CustomerDto> DeleteCustomerAsync(Guid customerId)
         {
-            var response = await _httpClient.DeleteAsync($"/api/customer/DeleteCustomer/{customerId}");
+            var response = await _httpClient.DeleteAsync($"/api/customers/DeleteCustomer/{customerId}");
             if (response.IsSuccessStatusCode)
             {
                 return await JsonSerializer.DeserializeAsync<CustomerDto>(
@@ -47,7 +47,7 @@ namespace BootstrapBlazorApp.Shared.Services
         {
             var serialize = JsonSerializer.Serialize(customerDto);
             var stringContent = new StringContent(serialize, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PutAsync($"api/Customer/PutCustomer/{customerDto.Id}", stringContent);
+            var response = await _httpClient.PutAsync($"api/Customers/PutCustomer/{customerDto.Id}", stringContent);
 
             if (response.IsSuccessStatusCode)
             {
@@ -66,7 +66,7 @@ namespace BootstrapBlazorApp.Shared.Services
         {
             var serialize = JsonSerializer.Serialize(customerDto);
             var stringContent = new StringContent(serialize, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync($"/api/Customer/AddCustomer/{customerDto.Id}", stringContent);
+            var response = await _httpClient.PostAsync($"/api/Customers/AddCustomer/{customerDto.Id}", stringContent);
 
             if (response.IsSuccessStatusCode)
             {
@@ -85,7 +85,7 @@ namespace BootstrapBlazorApp.Shared.Services
         {
             var serialize = JsonSerializer.Serialize(customerIds);
             var stringContent = new StringContent(serialize, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync("/api/Customer/DeleteManyCustomer", stringContent);
+            var response = await _httpClient.PostAsync("/api/Customers/DeleteManyCustomer", stringContent);
 
             if (response.IsSuccessStatusCode)
             {

@@ -35,7 +35,7 @@ namespace ShoppingAppApi.Controllers
 
         // GET: api/Customers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomer(Guid id)
+        public async Task<ActionResult<CustomerDto>> GetCustomer(Guid id)
         {
             var customer = await _context.Customer
                 // .Include(x => x.ShoppingBracket)
@@ -47,7 +47,7 @@ namespace ShoppingAppApi.Controllers
                 return NotFound();
             }
 
-            return customer;
+            return _mapper.Map<CustomerDto>(customer);
         }
 
         [HttpPost]

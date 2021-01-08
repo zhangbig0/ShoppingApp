@@ -3,56 +3,50 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BootstrapBlazorApp.Shared.Services;
+using Microsoft.AspNetCore.Components;
 using ShoppingApp.Share.Dto;
 
 namespace BootstrapBlazorApp.Shared.Pages
 {
     public partial class UserManage
     {
-        public List<AdminUserDto> AdminUserDtos { get; set; } = new List<AdminUserDto>();
-        public IAdminUserService AdminUserService { get; set; }
+        [Inject] public ICustomerServices CustomerServices { get; set; }
 
+        public List<CustomerDto> CustomerDtos { get; set; } = new List<CustomerDto>();
 
-        private Task<AdminUserDto> OnAddAsync()
+        public Task<CustomerDto> OnAddAsync()
         {
-            return Task.FromResult(new AdminUserDto
-            {
-                Id = Guid.Empty
-            });
+            return Task.FromResult(new CustomerDto());
+        }
+
+        private async Task<bool> OnDeleteAsync(IEnumerable<CustomerDto> customerDtos)
+        {
+            var customerId = customerDtos.Select(x => x.Id).ToList();
+            List<CustomerDto> deletedCustomerDtos = await CustomerServices.DeleteManyCustomerAsync(customerId);
+
+            return deletedCustomerDtos != null;
         }
 
         protected override async Task OnInitializedAsync()
         {
-            AdminUserDtos = await AdminUserService.GetAll();
+            CustomerDtos.AddRange(await CustomerServices.GetCustomerAsync());
+            await base.OnInitializedAsync();
         }
 
-        private async Task<bool> OnSaveAsync(AdminUserDto adminUserDto)
+        private async Task<bool> OnSaveAsync(CustomerDto saveCustomerDto)
         {
-            AdminUserDto adminUser;
-            var adminUserAddOrUpdateDto = new AdminUserAddOrUpdateDto
+            if (saveCustomerDto.Id == Guid.Empty ||
+                saveCustomerDto.Id.ToString() == "00000000-0000-0000-0000-000000000000")
             {
-                Account = adminUserDto.Account,
-                Password = adminUserDto.Password,
-                Role = adminUserDto.Role
-            };
-
-            if (adminUserDto.Id != Guid.Empty)
-            {
-                adminUser = await AdminUserService.UpdateAdminUser(adminUserDto.Id,
-                    adminUserAddOrUpdateDto);
+                var addCustomer = await CustomerServices.AddCustomerAsync(saveCustomerDto);
+                return addCustomer != null;
             }
             else
             {
-                adminUser = await AdminUserService.AddAdminUser(adminUserAddOrUpdateDto);
+                var updateCustomerAsync = await CustomerServices.UpdateCustomerAsync(saveCustomerDto);
+
+                return updateCustomerAsync != null;
             }
-
-            return adminUser != null;
-        }
-
-        private async Task<bool> OnDeleteAsync(IEnumerable<AdminUserDto> adminUserDtos)
-        {
-            var deleteAdminUser = await AdminUserService.DeleteAdminUser(adminUserDtos.Select(x => x.Id).ToList());
-            return deleteAdminUser != null;
         }
     }
 }

@@ -1,0 +1,15 @@
+﻿@page "/order"
+
+<Table AutoGenerateColumns="true" ClickToSelect="true" IsBordered="true" IsMultipleSelect="true" IsPagination="true" Items="@OrderDtos"
+       ShowExportButton="true" ShowExtendButtons="true" ShowSearch="true" ShowSkeleton="true" ShowToolbar="true" TItem="OrderDto"
+       OnQueryAsync="OnEditQueryAsync" SearchModel="SearchModel">
+    <TableColumns>
+        <TableColumn @bind-Field="@context.Id" Visible="false" Editable="false" Sortable="true" />
+        <TableColumn @bind-Field="@context.Count"/>
+        <TableColumn @bind-Field="@context.GoodsName" Searchable="true" />
+        <TableColumn @bind-Field="@context.GoodsPrice" />
+        <TableColumn @bind-Field="@context.DeliverAddress" Searchable="true"/>
+        <TableColumn @bind-Field="@context.TotalPrice" />
+        <TableColumn @bind-Field="@context.Account" Searchable="true"/>
+    </TableColumns>
+</Table>

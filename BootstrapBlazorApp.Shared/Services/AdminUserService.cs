@@ -51,10 +51,10 @@ namespace BootstrapBlazorApp.Shared.Services
         public async Task<List<AdminUserDto>> GetAll()
         {
             return await JsonSerializer.DeserializeAsync<List<AdminUserDto>>(
-                await _httpClient.GetStreamAsync("/api/AdminUser/"), new JsonSerializerOptions
+                await _httpClient.GetStreamAsync("/api/AdminUser/Index"), new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
-                });
+                }) ?? new List<AdminUserDto>();
         }
 
         public async Task<AdminUserDto> AddAdminUser(AdminUserAddOrUpdateDto adminUserAddOrUpdateDto)

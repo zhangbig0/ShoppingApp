@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Blazored.SessionStorage;
 using BootstrapBlazor.Components;
 using BootstrapBlazorApp.Shared.Services;
 using Microsoft.AspNetCore.Components;
@@ -15,11 +14,8 @@ namespace BootstrapBlazorApp.Shared.Pages
     public class GoodsBase : ComponentBase
     {
         [Inject] public IGoodsService GoodsService { get; set; }
-
         [Inject] public ToastService ToastService { get; set; }
-        [Inject] public MessageService MessageService { get; set; }
-        [Inject] public NavigationManager NavigationManager { get; set; }
-        [Inject] public ISessionStorageService SessionStorageService { get; set; }
+        [Inject] public IAuthentication Authentication { get; set; }
 
         public string ImgSrc { get; set; }
         public Toast Toast { get; set; }
@@ -35,23 +31,11 @@ namespace BootstrapBlazorApp.Shared.Pages
 
         public IList<GoodsDto> GoodsDtos { get; set; } = new List<GoodsDto>();
 
-        // public ConcurrentDictionary<Type, Func<IEnumerable<GoodsDto>, string, SortOrder, IEnumerable<GoodsDto>>>
-        //     SortLambdaCache { get; set; } = new();
-
 
         protected override async Task OnInitializedAsync()
         {
             GoodsDtos = (IList<GoodsDto>) await GoodsService.GetAll();
-
-            // var role = await SessionStorageService.GetItemAsync<string>("Role");
-            // if (string.IsNullOrWhiteSpace(role))
-            // {
-            //     var currentUri = NavigationManager.BaseUri.Substring("http://localhost:5000/".Length);
-            //     if (string.IsNullOrWhiteSpace(currentUri))
-            //     {
-            //         NavigationManager.NavigateTo($"login/");
-            //     }
-            // }
+            await Authentication.AuthenticateValidate();
 
             await base.OnInitializedAsync();
         }
@@ -100,6 +84,51 @@ namespace BootstrapBlazorApp.Shared.Pages
 
             ImgSrc = null;
             return await Task.FromResult(false);
+        }
+
+
+        protected Task<QueryData<GoodsDto>> OnEditQueryAsync(QueryPageOptions options) =>
+            OnQueryAsync(options, new List<GoodsDto>(GoodsDtos));
+
+        protected Task<QueryData<GoodsDto>> OnQueryAsync(QueryPageOptions options, IList<GoodsDto> item)
+        {
+            // if (!string.IsNullOrEmpty(SearchModel.Id.ToString()))
+            // {
+            //     item = item.Where(
+            //         x => x.Id.ToString().Contains(SearchModel.Id.ToString(),
+            //             StringComparison.OrdinalIgnoreCase)).ToList();
+            // }
+
+            if (!string.IsNullOrEmpty(SearchModel.Name))
+            {
+                item = item
+                    .Where(x => x.Name.Contains(SearchModel.Name, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(SearchModel.Class))
+            {
+                item = item
+                    .Where(x => x.Class.Contains(SearchModel.Class, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            if (!string.IsNullOrEmpty(options.SearchText))
+            {
+                // ReSharper disable once ComplexConditionExpression
+                item = item.Where(x =>
+                    x.Id.ToString().Contains(options.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                    x.Name.Contains(options.SearchText, StringComparison.OrdinalIgnoreCase) ||
+                    x.Class.Contains(options.SearchText,
+                        StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            return Task.FromResult(new QueryData<GoodsDto>()
+            {
+                Items = item,
+                IsSearch = !string.IsNullOrEmpty(SearchModel.Name) ||
+                           // SearchModel.Id != Guid.Empty ||
+                           !string.IsNullOrEmpty(SearchModel.Class)
+            });
         }
 
         public async Task OnFileChange(IEnumerable<UploadFile> uploadFiles)

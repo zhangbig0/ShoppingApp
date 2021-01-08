@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ShoppingApp.Share.Dto;
 using ShoppingAppApi.Entity;
 using ShoppingAppApi.Infrastructure;
 
@@ -15,17 +17,20 @@ namespace ShoppingAppApi.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public OrdersController(AppDbContext context)
+        public OrdersController(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Orders
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrder()
+        public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrder()
         {
-            return await _context.Order.Include(x => x.Goods).ToListAsync();
+            var orders = await _context.Order.Include(x => x.Goods).Include(x => x.Customer).ToListAsync();
+            return _mapper.Map<List<OrderDto>>(orders);
         }
 
         // GET: api/Orders/5
@@ -101,12 +106,13 @@ namespace ShoppingAppApi.Controllers
         }
 
         [HttpGet("{userId}")]
-        public async Task<ActionResult<IEnumerable<Order>>> CashFromShoppingBracket([FromRoute] Guid userId)
+        public async Task<ActionResult<List<OrderDto>>> CashFromShoppingBracket([FromRoute] Guid userId)
         {
             var customer = await _context.Customer.FindAsync(userId);
 
             var shoppingBracket = await _context.ShoppingBracket
-                // .ThenInclude(x => x.Goods)
+                .Include(x => x.GoodsList)
+                .ThenInclude(y => y.Goods)
                 .FirstOrDefaultAsync(x => x.CustomerId == userId);
 
             var shoppingBracketGoodsList = shoppingBracket.GoodsList;
@@ -127,9 +133,10 @@ namespace ShoppingAppApi.Controllers
                         Id = Guid.NewGuid(),
                         TotalPrice = shoppingBracketGoods.Goods.Price * shoppingBracketGoods.BracketGoodsNum
                     };
-                    await _context.Entry(order).Reference(x => x.Goods).LoadAsync();
-                    orders.Add(order);
 
+                    orders.Add(order);
+                    _context.Attach(order);
+                    await _context.Entry(order).Reference(x => x.Goods).LoadAsync();
                     shoppingBracketGoodsRemoveList.Add(shoppingBracketGoods);
                 }
             }
@@ -138,7 +145,7 @@ namespace ShoppingAppApi.Controllers
             _context.ShoppingBracketGoods.RemoveRange(shoppingBracketGoodsRemoveList);
             await _context.Order.AddRangeAsync(orders);
             await _context.SaveChangesAsync();
-            return orders;
+            return _mapper.Map<List<OrderDto>>(orders);
         }
 
         private bool OrderExists(Guid id)
