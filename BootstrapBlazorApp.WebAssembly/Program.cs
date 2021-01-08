@@ -32,14 +32,16 @@ namespace BootstrapBlazorApp.WebAssembly
 
             builder.Services.AddHttpClient<IGoodsService, GoodsService>(client =>
                 client.BaseAddress = new Uri("https://localhost:8000/"));
-            
+
             builder.Services.AddHttpClient<IAdminUserService, AdminUserService>(client =>
                 client.BaseAddress = new Uri("https://localhost:8000/"));
-            
+
+            // builder.Services.AddHttpClient<>()
+
             builder.Services.AddSingleton<WeatherForecastService>();
-            
+
             builder.Services.AddBootstrapBlazorTableExcelExport();
-            
+
             builder.Services.AddBlazoredSessionStorage();
 
             var host = builder.Build();

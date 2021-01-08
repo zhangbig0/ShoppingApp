@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using ShoppingAppApi.Infrastructure;
@@ -46,6 +47,7 @@ namespace ShoppingAppApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "DataAnalyse.Net", Version = "v1"});
             });
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +63,8 @@ namespace ShoppingAppApi
             app.UseHttpsRedirection();
 
             app.UseCors("Open");
+
+            app.UseStaticFiles();
 
             app.UseRouting();
 

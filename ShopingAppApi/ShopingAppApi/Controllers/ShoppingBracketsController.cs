@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using ShoppingApp.Share.Dto;
 using ShoppingAppApi.Entity;
 using ShoppingAppApi.Infrastructure;
@@ -17,10 +19,12 @@ namespace ShoppingAppApi.Controllers
     public class ShoppingBracketsController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public ShoppingBracketsController(AppDbContext context)
+        public ShoppingBracketsController(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/ShoppingBrackets
@@ -39,6 +43,7 @@ namespace ShoppingAppApi.Controllers
             {
                 return BadRequest("User not existence");
             }
+
             var shoppingBracket = await _context.ShoppingBracket.Include(x => x.GoodsList)
                 .ThenInclude(x => x.Goods)
                 .FirstOrDefaultAsync(x => x.Customer.Id == user.Id);
@@ -58,17 +63,12 @@ namespace ShoppingAppApi.Controllers
 
                 if (entity != null)
                 {
-                    return new ShoppingBracketGoodsListDto()
-                    {
-                        Count = 0,
-                        UserId = user.Id,
-                        GoodsList = new List<BracketGoodsDto>(),
-                        Id = shoppingBracketByUser.Id,
-                    };
+                    return _mapper.Map<ShoppingBracketGoodsListDto>(shoppingBracketByUser);
                 }
 
                 return BadRequest("创建购物车失败");
             }
+
             shoppingBracket.Count = shoppingBracket.GoodsList.Sum(x => x.BracketGoodsNum);
             await _context.SaveChangesAsync();
             if (shoppingBracket.GoodsList == null)
@@ -76,18 +76,8 @@ namespace ShoppingAppApi.Controllers
                 shoppingBracket.GoodsList = new List<ShoppingBracketGoods>();
                 await _context.SaveChangesAsync();
             }
-            return new ShoppingBracketGoodsListDto
-            {
-                Count = shoppingBracket.Count,
-                GoodsList = shoppingBracket.GoodsList.Select(x => new BracketGoodsDto
-                {
-                    Id = x.GoodsId,
-                    Name = x.Goods.Name,
-                    Num = x.BracketGoodsNum,
-                }).ToList(),
-                Id = shoppingBracket.Id,
-                UserId = shoppingBracket.CustomerId,
-            };
+
+            return _mapper.Map<ShoppingBracketGoodsListDto>(shoppingBracket);
         }
 
         // PUT: api/ShoppingBrackets/5
@@ -124,7 +114,7 @@ namespace ShoppingAppApi.Controllers
         // POST: api/ShoppingBrackets
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ShoppingBracket>> PostShoppingBracket(ShoppingBracket shoppingBracket)
+        public async Task<ActionResult<ShoppingBracketGoodsListDto>> PostShoppingBracket(ShoppingBracket shoppingBracket)
         {
             await _context.ShoppingBracket.AddAsync(shoppingBracket);
             await _context.SaveChangesAsync();
@@ -146,9 +136,6 @@ namespace ShoppingAppApi.Controllers
 
             if (shoppingBracket == null)
             {
-                var shoppingBracketGoodsListDto = ShoppingBracketGoodsListDtoFromNull(userId, goods);
-
-
                 var shoppingBracketGoods = new ShoppingBracketGoods()
                 {
                     BracketGoodsNum = 1,
@@ -172,10 +159,8 @@ namespace ShoppingAppApi.Controllers
                 await _context.ShoppingBracket.AddAsync(shoppingBracket);
                 await _context.SaveChangesAsync();
 
-                return shoppingBracketGoodsListDto;
+                return _mapper.Map<ShoppingBracketGoodsListDto>(shoppingBracket);
             }
-
-            shoppingBracket.GoodsList ??= new List<ShoppingBracketGoods>();
 
             if (shoppingBracket.GoodsList.Any(x => x.GoodsId == goods.Id))
             {
@@ -203,56 +188,34 @@ namespace ShoppingAppApi.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return new ShoppingBracketGoodsListDto
-            {
-                Count = shoppingBracket.Count,
-                GoodsList = shoppingBracket.GoodsList.Select(x => new BracketGoodsDto
-                {
-                    Id = x.GoodsId,
-                    Name = x.Goods.Name,
-                    Num = x.BracketGoodsNum
-                }).ToList(),
-                Id = shoppingBracket.Id,
-                UserId = userId
-            };
-        }
-
-        private static ShoppingBracketGoodsListDto ShoppingBracketGoodsListDtoFromNull(Guid userGuid, Goods goods)
-        {
-            return new ShoppingBracketGoodsListDto()
-            {
-                Count = 1,
-                Id = Guid.NewGuid(),
-                GoodsList = new List<BracketGoodsDto>()
-                {
-                    new BracketGoodsDto()
-                    {
-                        Id = goods.Id,
-                        Name = goods.Name,
-                        Num = 1,
-                    }
-                },
-                UserId = userGuid,
-            };
+            return _mapper.Map<ShoppingBracketGoodsListDto>(shoppingBracket);
         }
 
 
         [HttpPost("{userId}/{goodsId}")]
-        public async Task<ActionResult<ShoppingBracket>> DeleteGoodsToUserShoppingBracket([FromRoute] Guid userId,
+        public async Task<ActionResult<ShoppingBracketGoodsListDto>> MinusGoodsToUserShoppingBracket([FromRoute] Guid userId,
             [FromRoute] Guid goodsId)
         {
             var user = await _context.Customer.FindAsync(userId);
-            if (user==null)
+            if (user == null)
             {
                 return BadRequest("User not exist");
             }
-            var shoppingBracket = await _context.ShoppingBracket.FirstOrDefaultAsync(x => x.Customer == user);
-            if (shoppingBracket==null || shoppingBracket.Count ==0)
+
+            var shoppingBracket = await _context.ShoppingBracket.Include(bracket => bracket.GoodsList)
+                .FirstOrDefaultAsync(x => x.Customer == user);
+
+            if (shoppingBracket == null || shoppingBracket.Count == 0)
             {
                 return BadRequest("购物车为空");
             }
+
             var goods = _context.Goods.Include(x => x.InShoppingBracketGoods)
                 .FirstOrDefault(x => x.Id == goodsId);
+            if (goods == null)
+            {
+                return NotFound("商品不存在");
+            }
 
 
             if (shoppingBracket.GoodsList.Any() == false)
@@ -260,37 +223,140 @@ namespace ShoppingAppApi.Controllers
                 return BadRequest("购物车为空");
             }
 
-            if (shoppingBracket.GoodsList.Any(x => x.Goods.Id == goods.Id))
+            var bracketGoods = shoppingBracket.GoodsList.FirstOrDefault(x => x.GoodsId == goods.Id);
+            if (bracketGoods != null)
             {
+                if (bracketGoods.BracketGoodsNum == 0)
+                {
+                    return BadRequest("商品数量为0，不能继续删除");
+                }
 
+                bracketGoods.BracketGoodsNum--;
+            }
+            else
+            {
+                return NotFound("购物车不存在此商品");
             }
 
-            _context.Entry(shoppingBracket).State = EntityState.Modified;
+            _context.Entry(bracketGoods).State = EntityState.Modified;
+
+            shoppingBracket.Count =
+                shoppingBracket.GoodsList.Sum(shoppingBracketGoods => shoppingBracketGoods.BracketGoodsNum);
+            await _context.SaveChangesAsync();
+            return _mapper.Map<ShoppingBracketGoodsListDto>(shoppingBracket);
+        }
+
+        [HttpGet("{userId}/{goodsId}/{num}")]
+        public async Task<ActionResult<ShoppingBracketGoodsListDto>> ModifyGoodsToUserShoppingBracket(
+            [FromRoute] Guid userId,
+            [FromRoute] Guid goodsId, int num)
+        {
+            var user = await _context.Customer.FindAsync(userId);
+            if (user == null)
+            {
+                return BadRequest("User not exist");
+            }
+
+            var shoppingBracket = await _context.ShoppingBracket.Include(bracket => bracket.GoodsList)
+                .FirstOrDefaultAsync(x => x.Customer == user);
+
+            if (shoppingBracket == null || shoppingBracket.Count == 0)
+            {
+                return BadRequest("购物车为空");
+            }
+
+            var goods = _context.Goods.Include(x => x.InShoppingBracketGoods)
+                .FirstOrDefault(x => x.Id == goodsId);
+
+            if (goods == null)
+            {
+                return NotFound("商品不存在");
+            }
+
+
+            if (shoppingBracket.GoodsList.Any() == false)
+            {
+                return BadRequest("购物车为空");
+            }
+
+            var bracketGoods = shoppingBracket.GoodsList.FirstOrDefault(x => x.GoodsId == goods.Id);
+            bracketGoods.BracketGoodsNum = num;
+            bracketGoods.TotalPrice =
+                bracketGoods.Goods.Price * bracketGoods.BracketGoodsNum;
+            _context.Entry(bracketGoods).State = EntityState.Modified;
+
+            shoppingBracket.Count =
+                shoppingBracket.GoodsList.Sum(shoppingBracketGoods => shoppingBracketGoods.BracketGoodsNum);
+
+
 
             await _context.SaveChangesAsync();
-            return shoppingBracket;
+            return _mapper.Map<ShoppingBracketGoodsListDto>(shoppingBracket);
         }
 
         // DELETE: api/ShoppingBrackets/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteShoppingBracket(Guid id)
+        [HttpDelete("{userId}/{goodsId}")]
+        public async Task<ActionResult<ShoppingBracketGoodsListDto>> DeleteShoppingBracketGoods(Guid userId, Guid goodsId)
         {
-            var shoppingBracket = await _context.ShoppingBracket.FindAsync(id);
+            var shoppingBracket = await _context.ShoppingBracket.Include(bracket => bracket.GoodsList)
+                .FirstOrDefaultAsync(x => x.CustomerId == userId);
             if (shoppingBracket == null)
             {
                 return NotFound();
             }
 
-            _context.ShoppingBracket.Remove(shoppingBracket);
+            var shoppingBracketGoods = shoppingBracket.GoodsList.FirstOrDefault(x => x.GoodsId == goodsId);
+
+            _context.Remove(shoppingBracketGoods);
+            shoppingBracket.Count = shoppingBracket.GoodsList.Sum(goods => goods.BracketGoodsNum);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return _mapper.Map<ShoppingBracketGoodsListDto>(shoppingBracket);
         }
 
         [HttpGet]
         private bool ShoppingBracketExists(Guid id)
         {
             return _context.ShoppingBracket.Any(e => e.Id == id);
+        }
+
+        [HttpGet("{userId}/{goodsId}")]
+        public async Task<ActionResult<BracketGoodsDto>> ModifyShoppingBracketGoodsChecked(Guid userId, Guid goodsId,
+            [FromQuery] bool isChecked)
+        {
+            var shoppingBracket = await _context.ShoppingBracket.Include(x => x.GoodsList)
+                .FirstOrDefaultAsync(x => x.CustomerId == userId);
+
+            var shoppingBracketGoods = shoppingBracket.GoodsList.FirstOrDefault(x => x.GoodsId == goodsId);
+            shoppingBracketGoods.Checked = isChecked;
+            shoppingBracketGoods.TotalPrice =
+                shoppingBracketGoods.Goods.Price * shoppingBracketGoods.BracketGoodsNum;
+
+            shoppingBracket.TotalPrice = shoppingBracket.GoodsList.Sum(x => x.TotalPrice);
+            await _context.SaveChangesAsync();
+            return _mapper.Map<BracketGoodsDto>(shoppingBracketGoods);
+        }
+
+        [HttpPost("{userId}")]
+        public async Task<ActionResult<ShoppingBracketGoodsListDto>> ModifyShoppingBracketGoodsCheckedGroup(Guid userId,
+            [FromBody] IEnumerable<Guid> isChecked)
+        {
+            var shoppingBracket = await _context.ShoppingBracket
+                .Include(x => x.GoodsList)
+                .ThenInclude(y => y.Goods)
+                .FirstOrDefaultAsync(x => x.CustomerId == userId);
+
+            foreach (var shoppingBracketGoods in shoppingBracket.GoodsList)
+            {
+                shoppingBracketGoods.Checked = isChecked.Contains(shoppingBracketGoods.GoodsId);
+                shoppingBracketGoods.TotalPrice =
+                    shoppingBracketGoods.Goods.Price * shoppingBracketGoods.BracketGoodsNum;
+                _context.Entry(shoppingBracketGoods).State = EntityState.Modified;
+            }
+
+            shoppingBracket.TotalPrice = shoppingBracket.GoodsList.Sum(x => x.TotalPrice);
+            await _context.SaveChangesAsync();
+            return _mapper.Map<ShoppingBracketGoodsListDto>(shoppingBracket);
         }
     }
 }

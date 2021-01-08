@@ -10,8 +10,7 @@ using ShoppingAppApi.Infrastructure;
 
 namespace ShoppingAppApi.Controllers
 {
-    [Route("api/[controller]/[action]")]
-    [Produces("application/json")]
+    [Route("api/[controller]/[action]/")]
     [ApiController]
     public class OrdersController : ControllerBase
     {
@@ -26,7 +25,7 @@ namespace ShoppingAppApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrder()
         {
-            return await _context.Order.ToListAsync();
+            return await _context.Order.Include(x => x.Goods).ToListAsync();
         }
 
         // GET: api/Orders/5
@@ -82,7 +81,7 @@ namespace ShoppingAppApi.Controllers
             _context.Order.Add(order);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetOrder", new { id = order.Id }, order);
+            return CreatedAtAction("GetOrder", new {id = order.Id}, order);
         }
 
         // DELETE: api/Orders/5
@@ -100,7 +99,48 @@ namespace ShoppingAppApi.Controllers
 
             return NoContent();
         }
-        [HttpGet]
+
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<IEnumerable<Order>>> CashFromShoppingBracket([FromRoute] Guid userId)
+        {
+            var customer = await _context.Customer.FindAsync(userId);
+
+            var shoppingBracket = await _context.ShoppingBracket
+                // .ThenInclude(x => x.Goods)
+                .FirstOrDefaultAsync(x => x.CustomerId == userId);
+
+            var shoppingBracketGoodsList = shoppingBracket.GoodsList;
+            var orders = new List<Order>();
+            var shoppingBracketGoodsRemoveList = new List<ShoppingBracketGoods>();
+
+            foreach (var shoppingBracketGoods in shoppingBracketGoodsList)
+            {
+                if (shoppingBracketGoods.Checked)
+                {
+                    var order = new Order
+                    {
+                        Count = shoppingBracketGoods.BracketGoodsNum,
+                        Customer = customer,
+                        CustomerId = customer.Id,
+                        Goods = shoppingBracketGoods.Goods,
+                        GoodsId = shoppingBracketGoods.GoodsId,
+                        Id = Guid.NewGuid(),
+                        TotalPrice = shoppingBracketGoods.Goods.Price * shoppingBracketGoods.BracketGoodsNum
+                    };
+                    await _context.Entry(order).Reference(x => x.Goods).LoadAsync();
+                    orders.Add(order);
+
+                    shoppingBracketGoodsRemoveList.Add(shoppingBracketGoods);
+                }
+            }
+
+            shoppingBracket.GoodsList.RemoveAll(x => shoppingBracketGoodsRemoveList.Contains(x));
+            _context.ShoppingBracketGoods.RemoveRange(shoppingBracketGoodsRemoveList);
+            await _context.Order.AddRangeAsync(orders);
+            await _context.SaveChangesAsync();
+            return orders;
+        }
+
         private bool OrderExists(Guid id)
         {
             return _context.Order.Any(e => e.Id == id);

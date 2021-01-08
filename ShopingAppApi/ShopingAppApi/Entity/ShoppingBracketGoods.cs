@@ -9,5 +9,7 @@ namespace ShoppingAppApi.Entity
         public int BracketGoodsNum { get; set; }
         public Goods Goods { get; set; }
         public ShoppingBracket ShoppingBracket { get; set; }
+        public bool Checked { get; set; }
+        public decimal TotalPrice { get; set; }
     }
 }

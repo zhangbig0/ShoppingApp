@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShoppingAppApi.Infrastructure;
 
 namespace ShoppingAppApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210108031533_OrderPrice")]
+    partial class OrderPrice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,7 +99,7 @@ namespace ShoppingAppApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("786f21ac-dc8a-4a9e-bb13-ad991a104212"),
+                            Id = new Guid("041fa847-a762-483c-a76a-34a0327e638e"),
                             Class = "电器",
                             Name = "热水器",
                             Price = 300m,
@@ -105,7 +107,7 @@ namespace ShoppingAppApi.Migrations
                         },
                         new
                         {
-                            Id = new Guid("15060656-0d90-4be3-825a-9940100f04b6"),
+                            Id = new Guid("a91c56b5-1f5c-4dc5-a395-92cd4855eff6"),
                             Class = "电器",
                             Name = "冰箱",
                             Price = 270m,
@@ -113,7 +115,7 @@ namespace ShoppingAppApi.Migrations
                         },
                         new
                         {
-                            Id = new Guid("773be0cd-9624-4973-b0eb-f4184f5c2094"),
+                            Id = new Guid("4a2337b7-d669-4439-9105-46829bc8ca61"),
                             Class = "电器",
                             Name = "TV",
                             Price = 300m,
@@ -163,9 +165,6 @@ namespace ShoppingAppApi.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("char(36)");
 
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(65,30)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId")
@@ -187,9 +186,6 @@ namespace ShoppingAppApi.Migrations
 
                     b.Property<bool>("Checked")
                         .HasColumnType("tinyint(1)");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("GoodsId", "ShoppingBracketId");
 

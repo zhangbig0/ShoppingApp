@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using ShoppingApp.Share.Dto;
 using ShoppingAppApi.Entity;
@@ -19,71 +20,40 @@ namespace ShoppingAppApi.Controllers
     {
         private readonly IGoodsRepository _goodsRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IMapper _mapper;
 
-        public GoodsController(IGoodsRepository goodsRepository, IWebHostEnvironment webHostEnvironment)
+        public GoodsController(IGoodsRepository goodsRepository, IWebHostEnvironment webHostEnvironment, IMapper mapper)
         {
             _goodsRepository = goodsRepository;
             _webHostEnvironment = webHostEnvironment;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<GoodsDto>> Index()
         {
-            return _goodsRepository.GetAll().Select(goods => new GoodsDto
-            {
-                Class = goods.Class,
-                Id = goods.Id,
-                Name = goods.Name,
-                Price = goods.Price,
-                Stock = goods.Stock
-            }).ToList();
+            return _mapper.Map<List<GoodsDto>>(_goodsRepository.GetAll());
         }
 
         [HttpGet("{goodsName}")]
-        public ActionResult<IList<GoodsDto>> Search(string goodsName)
+        public ActionResult<List<GoodsDto>> Search(string goodsName)
         {
-            return _goodsRepository.GetByGoodName(goodsName).Select(goods => new GoodsDto
-            {
-                Class = goods.Class,
-                Id = goods.Id,
-                Name = goods.Name,
-                Price = goods.Price,
-                Stock = goods.Stock
-            }).ToList();
+            return _mapper.Map<List<GoodsDto>>(_goodsRepository.GetByGoodName(goodsName));
         }
 
         [HttpGet("{guid}")]
         public GoodsDto Detail([FromRoute] Guid guid)
         {
             var goods = _goodsRepository.GetById(guid);
-            return new GoodsDto
-            {
-                Class = goods.Class,
-                Id = goods.Id,
-                Name = goods.Name,
-                Price = goods.Price,
-                Stock = goods.Stock
-            };
+            return _mapper.Map<GoodsDto>(goods);
         }
 
         [HttpPost]
         public GoodsDto AddGoods([FromBody] GoodsAddOrUpdateDto goodsDto)
         {
-            var goods = _goodsRepository.AddGoods(new Goods
-            {
-                Class = goodsDto.Class,
-                Name = goodsDto.Name,
-                Price = goodsDto.Price,
-                Stock = goodsDto.Stock
-            });
-            return new GoodsDto
-            {
-                Class = goods.Class,
-                Id = goods.Id,
-                Name = goods.Name,
-                Price = goods.Price,
-                Stock = goods.Stock
-            };
+            var goods = _goodsRepository.AddGoods(
+                _mapper.Map<Goods>(goodsDto));
+            return _mapper.Map<GoodsDto>(goods);
         }
 
         [HttpPost]
@@ -91,56 +61,37 @@ namespace ShoppingAppApi.Controllers
         public ActionResult<GoodsDto> UpdateGoods([FromRoute] string guid,
             [FromBody] GoodsAddOrUpdateDto goodsAddOrUpdateDto)
         {
-            var goods = new Goods
-            {
-                Class = goodsAddOrUpdateDto.Class,
-                Name = goodsAddOrUpdateDto.Name,
-                Price = goodsAddOrUpdateDto.Price,
-                Stock = goodsAddOrUpdateDto.Stock,
-                Id = Guid.Parse(guid)
-            };
+            var goods = _mapper.Map<GoodsAddOrUpdateDto, Goods>(goodsAddOrUpdateDto);
+            goods.Id = Guid.Parse(guid);
             var updateGoods = _goodsRepository.UpdateGoods(goods);
             if (updateGoods == null)
             {
                 return NotFound();
             }
 
-            return new GoodsDto
-            {
-                Class = updateGoods.Class,
-                Id = updateGoods.Id,
-                Name = updateGoods.Name,
-                Price = updateGoods.Price,
-                Stock = updateGoods.Stock
-            };
+            return _mapper.Map<GoodsDto>(goods);
         }
 
         [HttpGet("{guid}")]
         public ActionResult<GoodsDto> DeleteGoods([FromRoute] string guid)
         {
             var deleteGoods = _goodsRepository.DeleteGoods(Guid.Parse(guid));
-            return new GoodsDto
-            {
-                Class = deleteGoods.Class,
-                Id = deleteGoods.Id,
-                Name = deleteGoods.Name,
-                Price = deleteGoods.Price,
-                Stock = deleteGoods.Stock
-            };
+            return _mapper.Map<GoodsDto>(deleteGoods);
         }
+
         [Consumes("multipart/form-data")]
         [HttpPost]
-        public async Task<ActionResult<string>> UploadFile(IFormFile imgFile)
+        public async Task<ActionResult<string>> UploadFile(IFormFile file)
         {
-            if (imgFile.Length > 0)
+            if (file.Length > 0)
             {
                 string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "image");
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + imgFile.FileName;
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                await imgFile.CopyToAsync(new FileStream(filePath, FileMode.Create));
+                await file.CopyToAsync(new FileStream(filePath, FileMode.Create));
 
-                return filePath;
+                return "/image/" + uniqueFileName;
             }
             else
             {

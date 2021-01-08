@@ -18,5 +18,6 @@ namespace ShoppingAppApi.Entity
         public int Count { get; set; }
         public Customer Customer { get; set; }
         public Guid CustomerId { get; set; }
+        public decimal TotalPrice { get; set; }
     }
 }

@@ -12,6 +12,11 @@ namespace ShoppingApp.Share.Dto
         [AutoGenerateColumn(Sortable = true)]
         public string Name { get; set; }
 
+        public Decimal Price { get; set; }
+        public string ImgSrc { get; set; }
+
         public int Num { get; set; }
+        public bool Checked { get; set; }
+        public decimal TotalPrice { get; set; }
     }
 }

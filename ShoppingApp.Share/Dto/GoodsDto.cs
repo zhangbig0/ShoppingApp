@@ -1,9 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
 using BootstrapBlazor.Components;
-using Microsoft.AspNetCore.Http;
 
 namespace ShoppingApp.Share.Dto
 {

@@ -33,7 +33,10 @@ namespace ShoppingAppApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetCustomer(Guid id)
         {
-            var customer = await _context.Customer.FindAsync(id);
+            var customer = await _context.Customer
+                // .Include(x => x.ShoppingBracket)
+                // .ThenInclude(x => x.GoodsList)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (customer == null)
             {

@@ -19,6 +19,7 @@
         <TableColumn @bind-Field="@context.Class"/>
         <TableColumn @bind-Field="@context.Stock"/>
         <TableColumn @bind-Field="@context.Stock"/>
+        <TableColumn @bind-Field="@context.ImgSrc"/>
     </TableColumns>
     <EditTemplate>
         <div class="form-inline">
@@ -36,7 +37,7 @@
                     <BootstrapInputNumber @bind-Value="@context.Price"></BootstrapInputNumber>
                 </div>
                 <div class="form-group col-12 col-sm-6">
-                    <BootstrapInput @bind-Value="@context.ImgSrc"></BootstrapInput>
+                    <BootstrapInput @bind-Value="@context.ImgSrc" ></BootstrapInput>
                 </div>
             </div>
             <Upload ShowDeleteButton="true" OnChange="@OnFileChange"></Upload>

@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShoppingAppApi.Infrastructure;
 
 namespace ShoppingAppApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210108023733_Order")]
+    partial class Order
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,6 +86,9 @@ namespace ShoppingAppApi.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
+                    b.Property<Guid?>("OrderId")
+                        .HasColumnType("char(36)");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(65,30)");
 
@@ -92,12 +97,14 @@ namespace ShoppingAppApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OrderId");
+
                     b.ToTable("Goods");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("786f21ac-dc8a-4a9e-bb13-ad991a104212"),
+                            Id = new Guid("e7cce350-600d-4174-99f3-1546511c9b80"),
                             Class = "电器",
                             Name = "热水器",
                             Price = 300m,
@@ -105,7 +112,7 @@ namespace ShoppingAppApi.Migrations
                         },
                         new
                         {
-                            Id = new Guid("15060656-0d90-4be3-825a-9940100f04b6"),
+                            Id = new Guid("6c9671fa-a3a6-47e6-b2dd-ebcb0805ad3f"),
                             Class = "电器",
                             Name = "冰箱",
                             Price = 270m,
@@ -113,7 +120,7 @@ namespace ShoppingAppApi.Migrations
                         },
                         new
                         {
-                            Id = new Guid("773be0cd-9624-4973-b0eb-f4184f5c2094"),
+                            Id = new Guid("0e2b61f6-6acd-4f8b-9d79-96b506a939a0"),
                             Class = "电器",
                             Name = "TV",
                             Price = 300m,
@@ -130,23 +137,15 @@ namespace ShoppingAppApi.Migrations
                     b.Property<int>("Count")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("CustomerId")
+                    b.Property<Guid?>("CustomerId")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("DeliverAddress")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
-                    b.Property<Guid>("GoodsId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(65,30)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
-
-                    b.HasIndex("GoodsId");
 
                     b.ToTable("Order");
                 });
@@ -162,9 +161,6 @@ namespace ShoppingAppApi.Migrations
 
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("char(36)");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 
@@ -188,9 +184,6 @@ namespace ShoppingAppApi.Migrations
                     b.Property<bool>("Checked")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(65,30)");
-
                     b.HasKey("GoodsId", "ShoppingBracketId");
 
                     b.HasIndex("ShoppingBracketId");
@@ -198,23 +191,20 @@ namespace ShoppingAppApi.Migrations
                     b.ToTable("ShoppingBracketGoods");
                 });
 
+            modelBuilder.Entity("ShoppingAppApi.Entity.Goods", b =>
+                {
+                    b.HasOne("ShoppingAppApi.Entity.Order", null)
+                        .WithMany("GoodsList")
+                        .HasForeignKey("OrderId");
+                });
+
             modelBuilder.Entity("ShoppingAppApi.Entity.Order", b =>
                 {
                     b.HasOne("ShoppingAppApi.Entity.Customer", "Customer")
-                        .WithMany("OrderList")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ShoppingAppApi.Entity.Goods", "Goods")
-                        .WithMany("InOrders")
-                        .HasForeignKey("GoodsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("CustomerId");
 
                     b.Navigation("Customer");
-
-                    b.Navigation("Goods");
                 });
 
             modelBuilder.Entity("ShoppingAppApi.Entity.ShoppingBracket", b =>
@@ -249,16 +239,17 @@ namespace ShoppingAppApi.Migrations
 
             modelBuilder.Entity("ShoppingAppApi.Entity.Customer", b =>
                 {
-                    b.Navigation("OrderList");
-
                     b.Navigation("ShoppingBracket");
                 });
 
             modelBuilder.Entity("ShoppingAppApi.Entity.Goods", b =>
                 {
-                    b.Navigation("InOrders");
-
                     b.Navigation("InShoppingBracketGoods");
+                });
+
+            modelBuilder.Entity("ShoppingAppApi.Entity.Order", b =>
+                {
+                    b.Navigation("GoodsList");
                 });
 
             modelBuilder.Entity("ShoppingAppApi.Entity.ShoppingBracket", b =>

@@ -9,5 +9,6 @@ namespace ShoppingApp.Share.Dto
         public Guid Id { get; set; }
         public List<BracketGoodsDto> GoodsList { get; set; }
         public int Count { get; set; }
+        public decimal TotalPrice { get; set; }
     }
 }

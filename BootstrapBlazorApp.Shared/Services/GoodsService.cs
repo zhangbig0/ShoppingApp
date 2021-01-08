@@ -97,14 +97,10 @@ namespace BootstrapBlazorApp.Shared.Services
         public async Task<string> UploadsImg(byte[] imgFileBmp, string fileName)
         {
             var fileContent = new ByteArrayContent(imgFileBmp);
-            fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
-            {
-                Name = "file",
-                FileName = fileName
-            };
 
-            MultipartFormDataContent multipartFormDataContent = new MultipartFormDataContent {fileContent};
-
+            MultipartFormDataContent multipartFormDataContent = new MultipartFormDataContent();
+            multipartFormDataContent.Add(fileContent, "file", fileName);
+            // multipartFormDataContent.Add( new ByteArrayContent());
             var httpResponseMessage = await _httpClient.PostAsync("/api/goods/UploadFile", multipartFormDataContent);
 
             var imgSrc = JsonSerializer.Deserialize<string>(await httpResponseMessage.Content.ReadAsStringAsync(),

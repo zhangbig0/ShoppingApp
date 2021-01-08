@@ -21,6 +21,8 @@ namespace BootstrapBlazorApp.Shared.Pages
         [Inject] public MessageService MessageService { get; set; }
         [Inject] public NavigationManager NavigationManager { get; set; }
         [Inject] public ISessionStorageService SessionStorageService { get; set; }
+
+        public string ImgSrc { get; set; }
         public Toast Toast { get; set; }
 
         public GoodsDto SearchModel { get; set; } = new GoodsDto()
@@ -70,7 +72,8 @@ namespace BootstrapBlazorApp.Shared.Pages
                 Class = item.Class,
                 Name = item.Name,
                 Price = item.Price,
-                Stock = item.Stock
+                Stock = item.Stock,
+                ImgSrc = ImgSrc
             };
             GoodsDto goodsDto;
             if (item.Id == Guid.Empty || item.Id.ToString() == "00000000-0000-0000-0000-000000000000")
@@ -96,13 +99,14 @@ namespace BootstrapBlazorApp.Shared.Pages
                 }
             }
 
+            ImgSrc = null;
             return await Task.FromResult(false);
         }
 
         public async Task OnFileChange(IEnumerable<UploadFile> uploadFiles)
         {
             var uploadFile = uploadFiles.ToList()[0];
-            var imgFileName = uploadFile.FileName;
+            var imgFileName = uploadFile.File.Name;
             if (uploadFile.File != null)
             {
                 var openReadStream = uploadFile.File.OpenReadStream();
@@ -117,14 +121,8 @@ namespace BootstrapBlazorApp.Shared.Pages
                 });
                 if (memoryStream != null)
                 {
-                    Toast?.SetPlacement(Placement.BottomEnd);
-                    ToastService?.Show(new ToastOption()
-                    {
-                        Category = ToastCategory.Success,
-                        Title = "保存成功",
-                        Content = "保存数据成功，4 秒后自动关闭"
-                    });
                     var data = memoryStream.ToArray();
+
 
                     var uploadsImgSrc = await GoodsService.UploadsImg(data, imgFileName);
                     if (uploadsImgSrc != null)
@@ -133,9 +131,10 @@ namespace BootstrapBlazorApp.Shared.Pages
                         ToastService?.Show(new ToastOption()
                         {
                             Category = ToastCategory.Success,
-                            Title = "保存成功",
+                            Title = "上传成功",
                             Content = "保存数据成功，4 秒后自动关闭"
                         });
+                        ImgSrc = uploadsImgSrc;
                     }
                 }
                 else
