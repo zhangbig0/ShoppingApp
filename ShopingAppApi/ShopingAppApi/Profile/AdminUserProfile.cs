@@ -3,11 +3,11 @@ using ShoppingAppApi.Entity;
 
 namespace ShoppingAppApi.Profile
 {
-    public class AdminUserDto:AutoMapper.Profile
+    public class AdminUserProfile:AutoMapper.Profile
     {
-        public AdminUserDto()
+        public AdminUserProfile()
         {
-            CreateMap<AdminUser, AdminUserDto>()
+            CreateMap<AdminUser, AdminUserProfile>()
                 .ReverseMap();
             CreateMap<AdminUser, AdminUserLoginDto>()
                 .ReverseMap();

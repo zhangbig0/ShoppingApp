@@ -36,7 +36,8 @@ namespace BootstrapBlazorApp.WebAssembly
             builder.Services.AddHttpClient<IAdminUserService, AdminUserService>(client =>
                 client.BaseAddress = new Uri("https://localhost:8000/"));
 
-            // builder.Services.AddHttpClient<>()
+            builder.Services.AddHttpClient<ICustomerServices, CustomerService>(client =>
+                client.BaseAddress = new Uri("https://localhost:8000/"));
 
             builder.Services.AddSingleton<WeatherForecastService>();
 

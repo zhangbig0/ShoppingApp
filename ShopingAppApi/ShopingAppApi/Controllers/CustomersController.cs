@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ShoppingApp.Share.Dto;
 using ShoppingAppApi.Entity;
 using ShoppingAppApi.Infrastructure;
 
@@ -16,10 +18,12 @@ namespace ShoppingAppApi.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public CustomersController(AppDbContext context)
+        public CustomersController(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Customers
@@ -64,13 +68,14 @@ namespace ShoppingAppApi.Controllers
         // PUT: api/Customers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCustomer(Guid id, Customer customer)
+        public async Task<ActionResult<CustomerDto>> PutCustomer(Guid id, CustomerDto customerDto)
         {
-            if (id != customer.Id)
+            if (id != customerDto.Id)
             {
                 return BadRequest();
             }
 
+            var customer = _mapper.Map<Customer>(customerDto);
             _context.Entry(customer).State = EntityState.Modified;
 
             try
@@ -89,7 +94,7 @@ namespace ShoppingAppApi.Controllers
                 }
             }
 
-            return NoContent();
+            return _mapper.Map<CustomerDto>(customerDto);
         }
 
         // POST: api/Customers
@@ -114,7 +119,7 @@ namespace ShoppingAppApi.Controllers
 
         // DELETE: api/Customers/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCustomer(Guid id)
+        public async Task<ActionResult<CustomerDto>> DeleteCustomer(Guid id)
         {
             var customer = await _context.Customer.FindAsync(id);
             if (customer == null)
@@ -125,13 +130,33 @@ namespace ShoppingAppApi.Controllers
             _context.Customer.Remove(customer);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return _mapper.Map<CustomerDto>(customer);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<List<CustomerDto>>> DeleteManyCustomer(List<Guid> customerIds)
+        {
+            var customers = await _context.Customer.Where(x => customerIds.Contains(x.Id)).ToListAsync();
+            _context.Customer.RemoveRange(customers);
+
+            return _mapper.Map<List<CustomerDto>>(customers);
         }
 
         [HttpGet]
         private bool CustomerExists(Guid id)
         {
             return _context.Customer.Any(e => e.Id == id);
+        }
+
+        [HttpPost]
+        public async Task<CustomerDto> AddCustomer(CustomerDto customerDto)
+        {
+            var customer = _mapper.Map<Customer>(customerDto);
+            customer.Created = DateTime.Now;
+            customer.Id = Guid.NewGuid();
+
+            await _context.Customer.AddAsync(customer);
+            return _mapper.Map<CustomerDto>(customer);
         }
     }
 }

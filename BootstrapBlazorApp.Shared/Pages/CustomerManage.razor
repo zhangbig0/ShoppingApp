@@ -1,0 +1,7 @@
+﻿@page "/customer-manage/"
+
+<Table TItem ="CustomerDto" AddModalTitle="增加商品" AutoGenerateColumns="true" ClickToSelect="true" EditModalTitle="商品编辑" EditMode="EditMode.EditForm" 
+       IsBordered="true" IsMultipleSelect="true" IsPagination="true" Items="@CustomerDtos" OnAddAsync="OnAddAsync" OnDeleteAsync="OnDeleteAsync"
+       OnSaveAsync="OnSaveAsync" PageItemsSource="new[] {4, 8}" ShowExportButton="true" ShowExtendButtons="true" ShowSearch="true" ShowSkeleton="true"
+       ShowToolbar="true">
+</Table>

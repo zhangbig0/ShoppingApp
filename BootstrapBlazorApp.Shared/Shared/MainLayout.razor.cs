@@ -46,7 +46,9 @@ namespace BootstrapBlazorApp.Shared.Shared
                 new MenuItem() {Text = "FetchData", Icon = "fa fa-fw fa-database", Url = "FetchData"},
                 new MenuItem() {Text = "Login", Icon = "fa fa-fw fa-database", Url = "login"},
                 new MenuItem() {Text = "Register", Icon = "fa fa-fw fa-database", Url = "Register"},
-                new MenuItem() {Text = "UserManager", Icon = "fa fa-fw fa-database", Url = "UserManager"}
+                new MenuItem() {Text = "User Manager", Icon = "fa fa-fw fa-database", Url = "user-manager"},
+                new MenuItem() {Text = "Customer Manage", Icon = "fa fa-fw fa-database", Url = "customer-manager"},
+
             };
 
             return menus;

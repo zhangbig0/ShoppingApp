@@ -2,13 +2,6 @@
 @inherits GoodsBase
 
 
-@using System.ComponentModel
-@using System.ComponentModel.DataAnnotations
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.Extensions.Logging
-@using Console = System.Console
-
-
 <Table TItem="GoodsDto" Items="@GoodsDtos" PageItemsSource="new[] {4, 8}" AutoGenerateColumns="true" IsMultipleSelect="true" IsBordered="true"
        IsPagination="true" ShowToolbar="true" ShowSearch="true" ShowExtendButtons="true" ShowSkeleton="true" AddModalTitle="增加商品"
        EditModalTitle="商品编辑" ClickToSelect="true" OnAddAsync="OnAddAsync" OnSaveAsync="OnSaveAsync" OnDeleteAsync="OnDeleteAsync"

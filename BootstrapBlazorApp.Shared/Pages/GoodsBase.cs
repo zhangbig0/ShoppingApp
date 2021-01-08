@@ -8,7 +8,6 @@ using Blazored.SessionStorage;
 using BootstrapBlazor.Components;
 using BootstrapBlazorApp.Shared.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using ShoppingApp.Share.Dto;
 
 namespace BootstrapBlazorApp.Shared.Pages
