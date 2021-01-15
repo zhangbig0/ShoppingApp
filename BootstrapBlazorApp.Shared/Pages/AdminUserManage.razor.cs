@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BootstrapBlazorApp.Shared.Services;
+using Microsoft.AspNetCore.Components;
 using ShoppingApp.Share.Dto;
 
 namespace BootstrapBlazorApp.Shared.Pages
 {
     public partial class AdminUserManage
     {
-
         public List<AdminUserDto> AdminUserDtos { get; set; } = new List<AdminUserDto>();
-        public IAdminUserService AdminUserService { get; set; }
+        [Inject] public IAdminUserService AdminUserService { get; set; }
 
 
         private Task<AdminUserDto> OnAddAsync()

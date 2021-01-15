@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ShoppingAppApi.Entity
 {
-    public class User
+    public abstract class User
     {
         [Key] public Guid Id { get; set; }
         [DisplayName("账户")] public string Account { get; set; }

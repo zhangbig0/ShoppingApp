@@ -7,7 +7,7 @@ namespace ShoppingAppApi.Profile
     {
         public AdminUserProfile()
         {
-            CreateMap<AdminUser, AdminUserProfile>()
+            CreateMap<AdminUser, AdminUserDto>()
                 .ReverseMap();
             CreateMap<AdminUser, AdminUserLoginDto>()
                 .ReverseMap();
